@@ -41,8 +41,10 @@ if (document.cookie.includes("username=")) {
 
 function login(e) {
     e.preventDefault();
-    document.cookie = "username=" + encodeURIComponent(document.getElementById("username-input").value)
-    socket.emit("login", document.getElementById("username-input").value);
+    if (document.getElementById("username-input").value !== "") {
+        document.cookie = "username=" + encodeURIComponent(document.getElementById("username-input").value)
+        socket.emit("login", document.getElementById("username-input").value);
+    }
 }
 
 function send(e) {
