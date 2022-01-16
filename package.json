@@ -1,7 +1,7 @@
 {
   "name": "sti3-chat",
   "version": "1.0.0",
-  "description": "A chat for my class.",
+  "description": "A chat app for my classmates.",
   "main": "server.js",
   "scripts": {
     
