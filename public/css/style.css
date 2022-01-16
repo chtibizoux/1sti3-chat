@@ -1,0 +1,255 @@
+body,
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background-color: #36393f;
+    color: #dcddde;
+    overflow: hidden;
+}
+
+.messages-section {
+    position: absolute;
+    top: 0;
+    bottom: 84px;
+    right: 300px;
+    left: 0;
+    overflow: auto;
+}
+
+.messages-section div {
+    margin: 0 50px;
+}
+
+.messages-section a {
+    color: #4798FF;
+    text-decoration: none;
+}
+
+.messages-section h2 {
+    font-size: 1rem;
+    color: white;
+}
+
+.messages-section span {
+    font-size: 0.75rem;
+    color: #72767d;
+    font-weight: 500;
+}
+
+.messages-section p {
+    margin-left: 30px;
+    overflow-wrap: break-word;
+}
+
+.users-section {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    text-align: center;
+    background-color: #2f3136;
+    color: white;
+}
+
+#users div {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 30px;
+    box-sizing: border-box;
+}
+
+.users-section svg {
+    width: 20px;
+    padding-right: 20px;
+}
+
+.send-section {
+    position: absolute;
+    bottom: 0;
+    right: 300px;
+    left: 0;
+}
+
+#file-upload {
+    display: flex;
+    width: fit-content;
+    padding: 10px 20px;
+    background-color: #2f3136;
+    border-radius: 10px;
+    margin: 0 20px;
+}
+
+#upload-progress {
+    margin-left: 10px;
+    width: 100px;
+}
+
+#file-to-upload {
+    display: flex;
+    cursor: pointer;
+    width: fit-content;
+    padding: 10px 20px;
+    background-color: #2f3136;
+    border-radius: 10px;
+    margin: 0 20px;
+}
+
+#file-to-upload svg {
+    width: 10px;
+    margin-left: 10px;
+}
+
+.send-section form {
+    position: relative;
+    margin: 20px 25px;
+}
+
+.send-section button {
+    height: 100%;
+    width: 44px;
+    cursor: pointer;
+    padding: 10px;
+    margin: 0 10px;
+    background: transparent;
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: none;
+    outline: 0;
+    color: #dcddde;
+    box-sizing: border-box;
+}
+
+.send-section input {
+    background-color: #40444b;
+    border: none;
+    outline: 0;
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+    color: #dcddde;
+    font-size: 1rem;
+    padding-left: 20px;
+    padding-right: 64px;
+    box-sizing: border-box;
+}
+
+.login-section {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #202225;
+    transition-duration: 1s;
+}
+
+.login-section form {
+    text-align: right;
+    max-width: 414px;
+    width: 100%;
+}
+
+.login-section input {
+    margin: 20px;
+    font-size: 16px;
+    color: #dcddde;
+    width: calc(100% - 40px);
+    outline: 0;
+    box-sizing: border-box;
+    transition: border-color .2s ease-in-out;
+    font-weight: 400;
+    padding: 10px;
+    height: 40px;
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 30%);
+    border-radius: 3px;
+}
+
+.login-section button {
+    margin: 20px;
+    height: 44px;
+    width: calc(100% - 40px);
+    border-radius: 3px;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 2px 16px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    background-color: hsl(235, 85.6%, 64.7%);
+}
+
+::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #202225;
+    min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-track {
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+    margin-bottom: 8px;
+    background-color: hsl(210, 9.8%, 20%);
+}
+
+#users-button {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    color: white;
+    background: #4f545c;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 640px) {
+    #users-button {
+        display: flex;
+    }
+
+    .send-section {
+        right: 0;
+    }
+
+    .messages-section {
+        right: 0;
+    }
+
+    .users-section {
+        width: 100%;
+        transform: translateX(100%);
+        transition-duration: 0.5s;
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "sti3-chat",
+  "version": "1.0.0",
+  "description": "A chat for my class.",
+  "main": "server.js",
+  "scripts": {
+    
+  },
+  "keywords": [
+    "valence",
+    "chat",
+    "sti2d",
+    "sti3",
+    "algoud",
+    "laffemas"
+  ],
+  "author": "Clément Songis",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "express-fileupload": "^1.2.1",
+    "socket.io": "^4.4.1"
+  }
+}
