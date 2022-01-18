@@ -5,31 +5,31 @@ const fileUpload = require("express-fileupload");
 const passport = require("passport");
 const DiscordStrategy = require("passport-discord.js").Strategy;
 
-if (!fs.existsSync("./config.json")) {
-    fs.writeFileSync("./config.json", `{ "token": "discord token here" }`);
+if (!fs.existsSync(__dirname + "/config.json")) {
+    fs.writeFileSync(__dirname + "/config.json", `{ "token": "discord token here" }`);
 }
-if (!fs.existsSync("./messages.json")) {
-    fs.writeFileSync("./messages.json", `[]`);
+if (!fs.existsSync(__dirname + "/messages.json")) {
+    fs.writeFileSync(__dirname + "/messages.json", `[]`);
 }
-if (!fs.existsSync("./users.json")) {
-    fs.writeFileSync("./users.json", `{}`);
+if (!fs.existsSync(__dirname + "/users.json")) {
+    fs.writeFileSync(__dirname + "/users.json", `{}`);
 }
-if (!fs.existsSync("./guilds.json")) {
-    fs.writeFileSync("./guilds.json", `{}`);
+if (!fs.existsSync(__dirname + "/guilds.json")) {
+    fs.writeFileSync(__dirname + "/guilds.json", `{}`);
 }
-if (!fs.existsSync("./public/files")) {
-    fs.mkdirSync("./public/files");
+if (!fs.existsSync(__dirname + "/public/files")) {
+    fs.mkdirSync(__dirname + "/public/files");
 }
 
-var config = require("./config.json");
-var messages = require("./messages.json");
-var users = require("./users.json");
+var config = require(__dirname + "/config.json");
+var messages = require(__dirname + "/messages.json");
+var users = require(__dirname + "/users.json");
 var connectedUsers = {};
 function saveUsers() {
-    fs.writeFileSync("./users.json", JSON.stringify(users));
+    fs.writeFileSync(__dirname + "/users.json", JSON.stringify(users));
 }
 
-var DiscordBot = require("./discord.js");
+var DiscordBot = require(__dirname + "/discord.js");
 const { get } = require("express/lib/response");
 var bot = new DiscordBot(config.token, send);
 
@@ -44,7 +44,7 @@ function send(user, text, file) {
         file: file
     };
     messages.push(message);
-    fs.writeFileSync("./messages.json", JSON.stringify(messages));
+    fs.writeFileSync(__dirname + "/messages.json", JSON.stringify(messages));
     io.emit("message", message);
 }
 
@@ -105,7 +105,7 @@ app.post("/upload", (req, res) => {
         console.log("No files were uploaded.");
         return res.status(400).send("No files were uploaded.");
     }
-    req.files.file.mv("./public/files/" + req.files.file.name, function (err) {
+    req.files.file.mv(__dirname + "/public/files/" + req.files.file.name, function (err) {
         if (err) {
             console.log(err);
             return res.status(500).send(err);
@@ -191,7 +191,7 @@ io.on("connection", (socket) => {
                 file: file
             };
             messages.push(message);
-            fs.writeFileSync("./messages.json", JSON.stringify(messages));
+            fs.writeFileSync(__dirname + "/messages.json", JSON.stringify(messages));
             io.emit("message", message);
             bot.send(message);
         }
