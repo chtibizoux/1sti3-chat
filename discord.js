@@ -3,6 +3,8 @@ const fs = require('fs');
 
 class DiscordBot {
     constructor(token, send) {
+        this.guilds = require("./guilds.json");
+        this.users = [];
         this.client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] });
         this.client.on('ready', async () => {
             console.log(`Logged in as ${this.client.user.tag}!`);
@@ -66,12 +68,8 @@ class DiscordBot {
                 }
             }
         });
-
         this.client.login(token);
     }
-    guilds = require("./guilds.json");
-    client;
-    users = [];
     async send(message) {
         var guilds = await this.client.guilds.fetch();
         guilds.each(async guild => {
