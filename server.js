@@ -89,7 +89,7 @@ passport.use(new DiscordStrategy({
     return done(null, profile);
 }));
 
-app.use(express.static("client"));
+app.use(express.static("./client"));
 app.get("/", function (req, res) {
     if (req.session.user) {
         connectedUsers[req.session.user.id] = req.session.user;
