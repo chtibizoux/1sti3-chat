@@ -55,7 +55,7 @@ var server = app.listen(port, () => {
 var io = require("socket.io")(server);
 
 var sessionMiddleware = session({
-    secret: "sti3-chat",
+    secret: "1sti3-chat",
     resave: true,
     saveUninitialized: true,
     cookie: {
