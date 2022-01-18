@@ -190,7 +190,6 @@ body {
     left: 0;
     top: 0;
     display: flex;
-    /* flex-direction: column; */
     justify-content: center;
     align-items: center;
     background-color: #202225;
@@ -328,6 +327,10 @@ body {
         right: 0;
     }
 
+    .login-section {
+        flex-direction: column;
+    }
+    
     .users-section {
         width: 100%;
         transform: translateX(100%);
