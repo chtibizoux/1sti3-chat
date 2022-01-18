@@ -80,10 +80,10 @@ class DiscordBot {
                 if (webhook) {
                     console.log("Send message to discord");
                     await webhook.send({
-                        avatarURL: message.author.avatar.startsWith("http") ? message.author.avatar : "https://sti3-chat.glitch.me" + message.author.avatar,
+                        avatarURL: message.author.avatar.startsWith("http") ? message.author.avatar : "https://1sti3-chat.glitch.me" + message.author.avatar,
                         username: message.author.name,
                         content: message.text,
-                        files: message.file ? ["https://sti3-chat.glitch.me" + message.file] : undefined
+                        files: message.file ? ["https://1sti3-chat.glitch.me" + message.file] : undefined
                     });
                 }
             }
