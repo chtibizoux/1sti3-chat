@@ -51,14 +51,14 @@ class DiscordBot {
                     if (!edited) {
                         console.log("Create Webhook");
                         var webhook = await channel.createWebhook('Chat bot', {
-                            avatar: __dirname + "public/images/user.png",
+                            avatar: "public/images/user.png",
                             reason: 'The chat webhook.'
                         });
                         this.guilds[interaction.guildId] = {
                             channel: channel.id,
                             webhook: webhook.id
                         };
-                        fs.writeFileSync(__dirname + "/guilds.json", JSON.stringify(this.guilds));
+                        fs.writeFileSync("guilds.json", JSON.stringify(this.guilds));
                     }
                     await interaction.reply('Channel is set to <#' + channel.id + '>!');
                 } else {
@@ -69,7 +69,7 @@ class DiscordBot {
 
         this.client.login(token);
     }
-    guilds = require(__dirname + "/guilds.json");
+    guilds = require("guilds.json");
     client;
     users = [];
     async send(message) {
@@ -82,7 +82,7 @@ class DiscordBot {
                 if (webhook) {
                     console.log("Send message to discord");
                     await webhook.send({
-                        avatarURL: message.author.avatar.startsWith("http") ? message.author.avatar : __dirname + "public" + message.author.avatar,
+                        avatarURL: message.author.avatar.startsWith("http") ? message.author.avatar : "https://sti3-chat.glitch.me/public" + message.author.avatar,
                         username: message.author.name,
                         content: message.text,
                         files: message.file ? ["https://sti3-chat.glitch.me" + message.file] : undefined
