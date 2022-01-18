@@ -17,8 +17,15 @@
   "author": "Clément Songis",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/rest": "^0.2.0-canary.0",
+    "discord-api-types": "^0.26.1",
+    "discord.js": "^13.6.0",
+    "ejs": "^3.1.6",
     "express": "^4.17.2",
     "express-fileupload": "^1.2.1",
+    "express-session": "^1.17.2",
+    "passport": "^0.5.2",
+    "passport-discord.js": "^0.0.6",
     "socket.io": "^4.4.1"
   }
 }

@@ -11,17 +11,48 @@ body {
     overflow: hidden;
 }
 
-.messages-section {
+.links-section {
+    display: flex;
     position: absolute;
     top: 0;
+    right: 300px;
+    left: 0;
+    padding: 10px 15px;
+}
+.links-section a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 10px;
+    margin-right: 10px;
+    color: white;
+    border-radius: 12px;
+}
+
+.messages-section {
+    position: absolute;
+    top: 60px;
     bottom: 84px;
     right: 300px;
     left: 0;
     overflow: auto;
 }
 
+.messages-section img {
+    position: absolute;
+    left: -60px;
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    margin-right: 20px;
+    vertical-align: middle;
+}
+
 .messages-section div {
-    margin: 0 50px;
+    margin: 0 80px;
+    position: relative;
 }
 
 .messages-section a {
@@ -65,9 +96,20 @@ body {
     box-sizing: border-box;
 }
 
-.users-section svg {
-    width: 20px;
-    padding-right: 20px;
+#discord-users div {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 30px;
+    box-sizing: border-box;
+}
+
+.users-section img {
+    border-radius: 20px;
+    width: 40px;
+    margin-right: 20px;
+    height: 40px;
 }
 
 .send-section {
@@ -148,7 +190,7 @@ body {
     left: 0;
     top: 0;
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     justify-content: center;
     align-items: center;
     background-color: #202225;
@@ -156,16 +198,22 @@ body {
 }
 
 .login-section form {
-    text-align: right;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
     max-width: 414px;
     width: 100%;
 }
 
+.error {
+    color: #ff4d4d;
+}
+
 .login-section input {
-    margin: 20px;
+    margin-bottom: 20px;
     font-size: 16px;
     color: #dcddde;
-    width: calc(100% - 40px);
+    width: 100%;
     outline: 0;
     box-sizing: border-box;
     transition: border-color .2s ease-in-out;
@@ -175,12 +223,20 @@ body {
     background-color: transparent;
     border: 1px solid rgba(0, 0, 0, 30%);
     border-radius: 3px;
+    transition-duration: 0.17s;
+}
+
+.login-section input:focus {
+    border-color: #00aff4;
 }
 
 .login-section button {
-    margin: 20px;
+    margin-bottom: 20px;
     height: 44px;
-    width: calc(100% - 40px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     border-radius: 3px;
     font-size: 16px;
     line-height: 24px;
@@ -188,7 +244,33 @@ body {
     cursor: pointer;
     border: none;
     color: white;
+    transition-duration: 0.17s;
     background-color: hsl(235, 85.6%, 64.7%);
+}
+
+.login-section h5 {
+    color: #b9bbbe;
+    margin: 0;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: default;
+}
+
+.login-section span {
+    color: #4798FF;
+    cursor: pointer;
+}
+
+.login-section svg {
+    width: 25px;
+    margin-left: 10px;
+}
+.login-section button:hover {
+    background-color: #4752c4;
 }
 
 ::-webkit-scrollbar {
@@ -216,7 +298,6 @@ body {
     margin-bottom: 8px;
     background-color: hsl(210, 9.8%, 20%);
 }
-
 #users-button {
     display: none;
     position: absolute;

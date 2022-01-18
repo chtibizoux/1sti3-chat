@@ -1,2 +1,7 @@
 node_modules
 public/files
+config.json
+guilds.json
+addSlashCommands.js
+messages.json
+users.json

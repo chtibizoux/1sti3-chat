@@ -1,6 +1,37 @@
 
 var socket = io();
 
+(function () {
+    var autoLink, slice = [].slice;
+    autoLink = function () {
+        var callback, k, linkAttributes, option, options, pattern, v;
+        options = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+        pattern = /(^|[\s\n]|<[A-Za-z]*\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
+        if (!(options.length > 0)) {
+            return this.replace(pattern, "$1<a href='$2'>$2</a>");
+        }
+        option = options[0];
+        callback = option["callback"];
+        linkAttributes = ((function () {
+            var results;
+            results = [];
+            for (k in option) {
+                v = option[k];
+                if (k !== 'callback') {
+                    results.push(" " + k + "='" + v + "'");
+                }
+            }
+            return results;
+        })()).join('');
+        return this.replace(pattern, function (match, space, url) {
+            var link;
+            link = (typeof callback === "function" ? callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
+            return "" + space + link;
+        });
+    };
+    String.prototype['autoLink'] = autoLink;
+}).call(this);
+
 function show() {
     var users = document.querySelector(".users-section");
     if (users.style.transform === "none") {
@@ -28,22 +59,23 @@ function add() {
     document.getElementById("file").click();
 }
 
-if (document.cookie.includes("username=")) {
-    var cookies = document.cookie.split(";");
-    for (const cookie of cookies) {
-        if (cookie.startsWith("username=")) {
-            document.getElementById("login").style.display = "none";
-            socket.emit("login", decodeURIComponent(cookie.replace("username=", "")));
-            break;
-        }
+function login(e) {
+    e.preventDefault();
+    socket.emit("login", document.getElementById("username-input").value, document.getElementById("password-input").value);
+}
+
+function register(e) {
+    e.preventDefault();
+    if (document.getElementById("register-username-input").value !== "" && document.getElementById("register-password-input").value === document.getElementById("register-password2-input").value) {
+        socket.emit("register", document.getElementById("register-username-input").value, document.getElementById("register-password-input").value, "/images/user.png");
     }
 }
 
-function login(e) {
-    e.preventDefault();
-    if (document.getElementById("username-input").value !== "") {
-        document.cookie = "username=" + encodeURIComponent(document.getElementById("username-input").value)
-        socket.emit("login", document.getElementById("username-input").value);
+function checkPassword() {
+    if (document.getElementById("register-password-input").value === document.getElementById("register-password2-input").value) {
+        document.getElementById("register-password2-input").style.borderColor = "";
+    } else {
+        document.getElementById("register-password2-input").style.borderColor = "red";
     }
 }
 
@@ -87,30 +119,40 @@ window.addEventListener("resize", () => {
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
 });
 
-socket.on("data", (socketID, users, messages) => {
+socket.on("data", (users, messages, discordUsers) => {
     document.getElementById("users").innerHTML = "";
     document.getElementById("msgs").innerHTML = "";
-    for (const user of users) {
-        document.getElementById("users").innerHTML += `<div id="${user.id}"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 448 512"><path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg><span>${user.name}</span></div>`;
+    for (const id in users) {
+        document.getElementById("users").innerHTML += `<div id="${users[id].id}"><img src="${users[id].avatar}"><span>${users[id].name}</span></div>`;
     }
     for (const message of messages) {
-        var file = message.file ? `<a href=${encodeURI(message.file)}>${message.file.replace("/files/", "")}</a>` : "";
-        document.getElementById("msgs").innerHTML += `<div><h2>${message.author.name} <span>${message.date}</span></h2><p>${message.text}</p>${file}</div>`;
+        var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
+        document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.autoLink()}</p>${file}</div>`;
+    }
+    for (const user of discordUsers) {
+        document.getElementById("discord-users").innerHTML += `<div id="${user.id}"><img src="${user.avatar}"><span>${user.name}</span></div>`;
     }
     document.getElementById("login").style.transform = "translateX(-100%)";
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
 });
+document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
+
+socket.on("error", (error) => {
+    Array.from(document.getElementsByClassName("error")).forEach((e) => {
+        e.innerHTML = error;
+    });
+});
 
 socket.on("message", (message) => {
-    var file = message.file ? `<a href=${encodeURI(message.file)}>${message.file.replace("/files/", "")}</a>` : "";
-    document.getElementById("msgs").innerHTML += `<div><h2>${message.author.name} <span>${message.date}</span></h2><p>${message.text}</p>${file}</div>`;
+    var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
+    document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.autoLink()}</p>${file}</div>`;
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
 });
 
 socket.on("user", (user) => {
-    document.getElementById("users").innerHTML += `<div id="${user.id}"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 448 512"><path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg><span>${user.name}</span></div>`;
+    document.getElementById("users").innerHTML += `<div id="${user.id}"><img src="${user.avatar}"><span>${user.name}</span></div>`;
 });
 
-socket.on("deleteUser", (user) => {
-    document.getElementById(user.id).remove();
+socket.on("deleteUser", (userID) => {
+    document.getElementById(userID).remove();
 });
