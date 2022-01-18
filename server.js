@@ -5,32 +5,31 @@ const fileUpload = require("express-fileupload");
 const passport = require("passport");
 const DiscordStrategy = require("passport-discord.js").Strategy;
 
-if (!fs.existsSync("config.json")) {
+if (!fs.existsSync("./config.json")) {
     throw "Please create config.json file config.json.exemple is an exemple";
 }
-if (!fs.existsSync("messages.json")) {
-    fs.writeFileSync("messages.json", `[]`);
+if (!fs.existsSync("./messages.json")) {
+    fs.writeFileSync("./messages.json", `[]`);
 }
-if (!fs.existsSync("users.json")) {
-    fs.writeFileSync("users.json", `{}`);
+if (!fs.existsSync("./users.json")) {
+    fs.writeFileSync("./users.json", `{}`);
 }
-if (!fs.existsSync("guilds.json")) {
-    fs.writeFileSync("guilds.json", `{}`);
+if (!fs.existsSync("./guilds.json")) {
+    fs.writeFileSync("./guilds.json", `{}`);
 }
-if (!fs.existsSync("public/files")) {
-    fs.mkdirSync("public/files");
+if (!fs.existsSync("./public/files")) {
+    fs.mkdirSync("./public/files");
 }
 
-var config = require("config.json");
-var messages = require("messages.json");
-var users = require("users.json");
+var config = require("./config.json");
+var messages = require("./messages.json");
+var users = require("./users.json");
 var connectedUsers = {};
 function saveUsers() {
-    fs.writeFileSync("users.json", JSON.stringify(users));
+    fs.writeFileSync("./users.json", JSON.stringify(users));
 }
 
-var DiscordBot = require("discord.js");
-const { get } = require("express/lib/response");
+var DiscordBot = require("./discord.js");
 var bot = new DiscordBot(config.token, send);
 
 function send(user, text, file) {
@@ -105,7 +104,7 @@ app.post("/upload", (req, res) => {
         console.log("No files were uploaded.");
         return res.status(400).send("No files were uploaded.");
     }
-    req.files.file.mv("public/files/" + req.files.file.name, function (err) {
+    req.files.file.mv("./public/files/" + req.files.file.name, function (err) {
         if (err) {
             console.log(err);
             return res.status(500).send(err);
@@ -191,7 +190,7 @@ io.on("connection", (socket) => {
                 file: file
             };
             messages.push(message);
-            fs.writeFileSync("messages.json", JSON.stringify(messages));
+            fs.writeFileSync("./messages.json", JSON.stringify(messages));
             io.emit("message", message);
             bot.send(message);
         }
