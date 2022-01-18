@@ -1,5 +1,4 @@
 node_modules
-client/files
 config.json
 guilds.json
 addSlashCommands.js
