@@ -17,8 +17,8 @@ if (!fs.existsSync("./users.json")) {
 if (!fs.existsSync("./guilds.json")) {
     fs.writeFileSync("./guilds.json", `{}`);
 }
-if (!fs.existsSync("./public/files")) {
-    fs.mkdirSync("./public/files");
+if (!fs.existsSync("./client/files")) {
+    fs.mkdirSync("./client/files");
 }
 
 var config = require("./config.json");
@@ -89,7 +89,7 @@ passport.use(new DiscordStrategy({
     return done(null, profile);
 }));
 
-app.use(express.static("public"));
+app.use(express.static("client"));
 app.get("/", function (req, res) {
     if (req.session.user) {
         connectedUsers[req.session.user.id] = req.session.user;
@@ -104,7 +104,7 @@ app.post("/upload", (req, res) => {
         console.log("No files were uploaded.");
         return res.status(400).send("No files were uploaded.");
     }
-    req.files.file.mv("./public/files/" + req.files.file.name, function (err) {
+    req.files.file.mv("./client/files/" + req.files.file.name, function (err) {
         if (err) {
             console.log(err);
             return res.status(500).send(err);

@@ -53,7 +53,7 @@ class DiscordBot {
                     if (!edited) {
                         console.log("Create Webhook");
                         var webhook = await channel.createWebhook('Chat bot', {
-                            avatar: "./public/images/user.png",
+                            avatar: "./client/images/user.png",
                             reason: 'The chat webhook.'
                         });
                         this.guilds[interaction.guildId] = {
