@@ -204,6 +204,14 @@ body {
     width: 100%;
 }
 
+#login-other {
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    max-width: 414px;
+    width: 100%;
+}
+
 .error {
     color: #ff4d4d;
 }
@@ -357,6 +365,9 @@ code {
 }
 
 @media screen and (max-width: 640px) {
+    .links-section {
+        right: 0;
+    }
     #users-button {
         display: flex;
     }
