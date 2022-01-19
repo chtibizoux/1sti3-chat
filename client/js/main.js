@@ -189,9 +189,9 @@ function getMentions() {
 }
 const publicVapidKey = "BFmbQp2AEC62owsB0l9XQmfHRgGclwrkywTpHYHyGT7y8-ucYu9vAeYnXwB93jB-Xd_51isZDCJoj0v5cdY-HOU";
 if ("serviceWorker" in navigator) {
-    send().catch(err => console.error(err));
+    sendWorker().catch(err => console.error(err));
 }
-async function send() {
+async function sendWorker() {
     console.log("Registering service worker...");
     const register = await navigator.serviceWorker.register("/worker.js", {
         scope: "/"

@@ -47,6 +47,9 @@ function send(user, text, file) {
     messages.push(message);
     fs.writeFileSync("messages.json", JSON.stringify(messages));
     io.emit("message", message);
+    for (const subscription of subscriptions) {
+        webpush.sendNotification(subscription, JSON.stringify({ title: "Nouveau message", icon: "/images/favicon.ico", body: text })).catch(err => console.error(err));
+    }
 }
 
 const app = express();
