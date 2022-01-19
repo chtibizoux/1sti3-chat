@@ -195,6 +195,11 @@ io.on("connection", (socket) => {
             bot.send(message);
         }
     });
+    socket.on("getMentions", (mentions) => {
+        bot.getMentions(mentions, users).then((mentions) => {
+            socket.emit("mentions", mentions);
+        });
+    });
     socket.on("disconnect", () => {
         if (req.session.user && connectedUsers[req.session.user.id]) {
             delete connectedUsers[req.session.user.id]

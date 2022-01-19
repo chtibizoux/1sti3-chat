@@ -70,6 +70,41 @@ class DiscordBot {
         });
         this.client.login(token);
     }
+    async getMentions(mentions, users) {
+        var mentionsToSend = {};
+        for (const mention of mentions) {
+            if (mention.startsWith("#")) {
+                var guilds = await this.client.guilds.fetch();
+                for (var guild of Array.from(guilds.values())) {
+                    guild = await guild.fetch();
+                    try {
+                        var channel = await guild.channels.fetch(mention.slice(1));
+                        mentionsToSend[mention] = "#" + channel.name;
+                        continue;
+                    } catch (e) { }
+                }
+            } else if (mention.startsWith("@")) {
+                if (users[mention.slice(1)]) {
+                    mentionsToSend[mention] = "@" + users[mention.slice(1)].name;
+                    continue;
+                }
+                var guilds = await this.client.guilds.fetch();
+                for (var guild of Array.from(guilds.values())) {
+                    guild = await guild.fetch();
+                    try {
+                        var member = await guild.members.fetch(mention.slice(1));
+                        mentionsToSend[mention] = "@" + member.user.username;
+                        continue;
+                    } catch (e) { }
+                    try {
+                        var role = await guild.roles.fetch(mention.slice(1));
+                        mentionsToSend[mention] = "@" + role.name;
+                    } catch (e) { }
+                }
+            }
+        }
+        return mentionsToSend;
+    }
     async send(message) {
         var guilds = await this.client.guilds.fetch();
         guilds.each(async guild => {

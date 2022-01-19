@@ -28,35 +28,48 @@
         </a>
     </section>
     <% (function () {
-        var autoLink, slice = [].slice;
-        autoLink = function () {
-            var callback, k, linkAttributes, option, options, pattern, v;
-            options = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-            pattern = /(^|[\s\n]|<[A-Za-z]*\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
-            if (!(options.length > 0)) {
-                return this.replace(pattern, "$1<a href='$2'>$2</a>");
-            }
-            option = options[0];
-            callback = option["callback"];
-            linkAttributes = ((function () {
-                var results;
-                results = [];
-                for (k in option) {
-                    v = option[k];
-                    if (k !== 'callback') {
-                        results.push(" " + k + "='" + v + "'");
-                    }
+    var autoLink, slice = [].slice;
+    autoLink = function () {
+        var callback, k, linkAttributes, option, options, pattern, v;
+        options = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+        pattern = /(^|[\s\n]|<[A-Za-z]*\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
+        if (!(options.length > 0)) {
+            return this.replace(pattern, "$1<a href='$2'>$2</a>");
+        }
+        option = options[0];
+        callback = option["callback"];
+        linkAttributes = ((function () {
+            var results;
+            results = [];
+            for (k in option) {
+                v = option[k];
+                if (k !== 'callback') {
+                    results.push(" " + k + "='" + v + "'");
                 }
-                return results;
-            })()).join('');
-            return this.replace(pattern, function (match, space, url) {
-                var link;
-                link = (typeof callback === "function" ? callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
-                return "" + space + link;
-            });
-        };
-        String.prototype['autoLink'] = autoLink;
-    }).call(this); %>
+            }
+            return results;
+        })()).join('');
+        return this.replace(pattern, function (match, space, url) {
+            var link;
+            link = (typeof callback === "function" ? callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
+            return "" + space + link;
+        });
+    };
+    String.prototype['autoLink'] = autoLink;
+    var format = function () {
+        return this.autoLink()
+            .replace(/```(.*\n)?([^```][^```]*)```/g, "<pre><code>$2</code></pre>")
+            .replace(/`([^`][^`]*)`/g, "<code>$1</code>")
+            .replace(/~~([^~~][^~~]*)~~/g, "<s>$1</s>")
+            .replace(/<@!?&?([0-9]{18})>/g, "<span class='mention'>@$1</span>")
+            .replace(/<#([0-9]{18})>/g, "<span class='mention'>#$1</span>")
+            .replace(/\|\|([^\|\|][^\|\|]*)\|\|/g, "<span onclick=\"this.classList.toggle('show')\" class='spoiler'>$1</span>")
+            .replace(/\*\*([^\*\*][^\*\*]*)\*\*/g, "<strong>$1</strong>")
+            .replace(/__([^__][^__]*)__/g, "<u>$1</u>")
+            .replace(/[\*_]([^\*_][^\*_]*)[\*_]/g, "<em>$1</em>");
+    }
+    String.prototype['discordFormat'] = format;
+}).call(this); %>
     <section class="messages-section" id="msgs">
         <% if (connected) { %>
         <% for (const message of messages) { %>
@@ -64,7 +77,7 @@
         <div>
             <img src="<%= message.author.avatar %>">
             <h2><%= message.author.name %> <span><%= message.date %><%= message.discord ? " DISCORD" : "" %></span></h2>
-            <p><%- message.text.autoLink() %></p>
+            <p><%- message.text.discordFormat() %></p>
             <%= file %>
         </div>
         <% } %>
@@ -85,7 +98,7 @@
             <% } %>
         </div>
         <h3>
-            Discord
+            Discord Server
         </h3>
         <div id="discord-users">
             <% if (connected) { %>

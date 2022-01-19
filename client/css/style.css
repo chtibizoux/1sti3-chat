@@ -228,7 +228,49 @@ body {
 .login-section input:focus {
     border-color: #00aff4;
 }
-
+span.spoiler {
+    background-color: #202225;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all .1s ease;
+    padding: 3px 0;
+    font-size: 1em;
+    color: transparent;
+}
+span.mention {
+    background-color: #5865f24d;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 3px 2px;
+    font-size: 1em;
+    color: white;
+}
+span.spoiler.show {
+    background-color: hsla(0, 0%, 100%, .1);
+    color: white;
+}
+pre code {
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    text-indent: 0;
+    white-space: pre-wrap;
+    background: #2f3136;
+    border: 1px solid #202225;
+    display: block;
+    overflow-x: auto;
+    padding: .5em;
+    border-radius: 4px;
+    color: #b9bbbe;
+    text-size-adjust: none;
+}
+code {
+    padding: .2em;
+    border-radius: 3px;
+    background: #2f3136;
+    white-space: pre-wrap;
+    font-size: 1.1em;
+    margin: 0 -1px;
+}
 .login-section button {
     margin-bottom: 20px;
     height: 44px;

@@ -30,6 +30,19 @@ var socket = io();
         });
     };
     String.prototype['autoLink'] = autoLink;
+    var format = function () {
+        return this.autoLink()
+            .replace(/```(.*\n)?([^```][^```]*)```/g, "<pre><code>$2</code></pre>")
+            .replace(/`([^`][^`]*)`/g, "<code>$1</code>")
+            .replace(/~~([^~~][^~~]*)~~/g, "<s>$1</s>")
+            .replace(/<@!?&?([0-9]{18})>/g, "<span class='mention'>@$1</span>")
+            .replace(/<#([0-9]{18})>/g, "<span class='mention'>#$1</span>")
+            .replace(/\|\|([^\|\|][^\|\|]*)\|\|/g, "<span onclick=\"this.classList.toggle('show')\" class='spoiler'>$1</span>")
+            .replace(/\*\*([^\*\*][^\*\*]*)\*\*/g, "<strong>$1</strong>")
+            .replace(/__([^__][^__]*)__/g, "<u>$1</u>")
+            .replace(/[\*_]([^\*_][^\*_]*)[\*_]/g, "<em>$1</em>");
+    }
+    String.prototype['discordFormat'] = format;
 }).call(this);
 
 function show() {
@@ -114,7 +127,6 @@ function send(e) {
         document.getElementById("file").value = '';
     }
 }
-
 window.addEventListener("resize", () => {
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
 });
@@ -127,14 +139,16 @@ socket.on("data", (users, messages, discordUsers) => {
     }
     for (const message of messages) {
         var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
-        document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.autoLink()}</p>${file}</div>`;
+        document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     }
     for (const user of discordUsers) {
         document.getElementById("discord-users").innerHTML += `<div id="${user.id}"><img src="${user.avatar}"><span>${user.name}</span></div>`;
     }
     document.getElementById("login").style.transform = "translateX(-100%)";
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
+    getMentions();
 });
+getMentions();
 document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
 
 socket.on("error", (error) => {
@@ -142,11 +156,11 @@ socket.on("error", (error) => {
         e.innerHTML = error;
     });
 });
-
 socket.on("message", (message) => {
     var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
-    document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.autoLink()}</p>${file}</div>`;
+    document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
+    getMentions();
 });
 
 socket.on("user", (user) => {
@@ -156,3 +170,20 @@ socket.on("user", (user) => {
 socket.on("deleteUser", (userID) => {
     document.getElementById(userID).remove();
 });
+socket.on("mentions", (mentions) => {
+    for (const span of Array.from(document.getElementsByClassName("mention"))) {
+        if (mentions[span.innerHTML]) {
+            span.innerHTML = mentions[span.innerHTML];
+            span.classList.add("parsed");
+        }
+    }
+});
+function getMentions() {
+    var mentions = [];
+    for (const span of Array.from(document.getElementsByClassName("mention"))) {
+        if (!span.classList.contains("parsed")) {
+            mentions.push(span.innerHTML);
+        }
+    }
+    socket.emit("getMentions", mentions);
+}
