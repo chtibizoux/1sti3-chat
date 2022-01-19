@@ -144,17 +144,19 @@ function send(e) {
             }, false);
             ajax.addEventListener("load", () => {
                 document.getElementById("file-upload").style.display = "none";
-                socket.emit("send", message, name);
+                socket.emit("send", message, "/files/" + name);
             }, false);
             ajax.addEventListener("error", () => {
                 document.getElementById("file-upload").style.backgroundColor = "red";
                 document.getElementById("upload-name").innerHTML += " error";
                 document.getElementById("upload-progress").value = "100";
+                socket.emit("send", message, null);
             }, false);
             ajax.addEventListener("abort", () => {
                 document.getElementById("file-upload").style.backgroundColor = "red";
                 document.getElementById("upload-name").innerHTML += " abort";
                 document.getElementById("upload-progress").value = "100";
+                socket.emit("send", message, null);
             }, false);
             ajax.open("POST", "/upload");
             ajax.send(data);
