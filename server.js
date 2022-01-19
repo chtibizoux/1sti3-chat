@@ -2,6 +2,8 @@ const fs = require("fs");
 const express = require("express");
 const session = require("express-session");
 const fileUpload = require("express-fileupload");
+const webpush = require("web-push");
+const bodyParser = require("body-parser");
 const passport = require("passport");
 const DiscordStrategy = require("passport-discord.js").Strategy;
 
@@ -69,10 +71,25 @@ io.use(function (socket, next) {
 });
 app.set("view engine", "ejs");
 
+app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
+var subscriptions = [];
+const publicVapidKey =
+    "BFmbQp2AEC62owsB0l9XQmfHRgGclwrkywTpHYHyGT7y8-ucYu9vAeYnXwB93jB-Xd_51isZDCJoj0v5cdY-HOU";
+const privateVapidKey = "0Hb8ooncdCvXnxvRY8LtppWIeitOQcyBflnYu8ZfLzM";
+webpush.setVapidDetails(
+    "mailto:5clemans585@gmail.com",
+    publicVapidKey,
+    privateVapidKey
+);
+
+app.post("/subscribe", (req, res) => {
+    subscriptions.push(req.body);
+    res.status(201).json({});
+});
 
 passport.serializeUser(function (u, d) {
     d(null, u);
@@ -193,6 +210,9 @@ io.on("connection", (socket) => {
             fs.writeFileSync("./messages.json", JSON.stringify(messages));
             io.emit("message", message);
             bot.send(message);
+        }
+        for (const subscription of subscriptions) {
+            webpush.sendNotification(subscription, JSON.stringify({ title: "Nouveau message", icon: "/images/favicon.ico", body: text })).catch(err => console.error(err));
         }
     });
     socket.on("getMentions", (mentions) => {
