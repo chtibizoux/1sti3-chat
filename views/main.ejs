@@ -64,6 +64,8 @@
             .replace(/`([^`][^`]*)`/g, "<code>$1</code>")
             .replace(/~~([^~~][^~~]*)~~/g, "<s>$1</s>")
             .replace(/<@!?&?([0-9]{18})>/g, "<span class='mention'>@$1</span>")
+            .replace("@everyone", "<span class='mention'>@everyone</span>")
+            .replace("@here", "<span class='mention'>@here</span>")
             .replace(/<#([0-9]{18})>/g, "<span class='mention'>#$1</span>")
             .replace(/\|\|([^\|\|][^\|\|]*)\|\|/g, "<span onclick=\"this.classList.toggle('show')\" class='spoiler'>$1</span>")
             .replace(/\*\*([^\*\*][^\*\*]*)\*\*/g, "<strong>$1</strong>")
@@ -80,7 +82,7 @@
             <img src="<%= message.author.avatar %>">
             <h2><%= message.author.name %> <span><%= message.date %><%= message.discord ? " DISCORD" : "" %></span></h2>
             <p><%- message.text.discordFormat() %></p>
-            <%= file %>
+            <%- file %>
         </div>
         <% } %>
         <% } %>

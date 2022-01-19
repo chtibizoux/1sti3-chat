@@ -39,6 +39,8 @@ var socket = io();
             .replace(/<#([0-9]{18})>/g, "<span class='mention'>#$1</span>")
             .replace(/\|\|([^\|\|][^\|\|]*)\|\|/g, "<span onclick=\"this.classList.toggle('show')\" class='spoiler'>$1</span>")
             .replace(/\*\*([^\*\*][^\*\*]*)\*\*/g, "<strong>$1</strong>")
+            .replace("@everyone", "<span class='mention'>@everyone</span>")
+            .replace("@here", "<span class='mention'>@here</span>")
             .replace(/__([^__][^__]*)__/g, "<u>$1</u>")
             .replace(/[\*_]([^\*_][^\*_]*)[\*_]/g, "<em>$1</em>");
     }

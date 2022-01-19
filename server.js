@@ -168,7 +168,7 @@ io.on("connection", (socket) => {
     socket.on("register", (username, password, avatar) => {
         username = username.trim();
         for (const id in users) {
-            if (users[id].username === username) {
+            if (users[id].name === username) {
                 socket.emit("error", "Error: username already exist.");
                 return;
             }
