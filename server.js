@@ -90,6 +90,12 @@ webpush.setVapidDetails(
 );
 
 app.post("/subscribe", (req, res) => {
+    for (const subscription of subscriptions) {
+        if (req.body.keys.p256dh === subscription.keys.p256dh) {
+            res.status(201).json({});
+            return;
+        }
+    }
     subscriptions.push(req.body);
     res.status(201).json({});
 });

@@ -63,13 +63,24 @@ function uploaded() {
     }
 }
 
+function avatarUploaded() {
+    if (document.getElementById("avatar-file").files[0]) {
+        var reader = new FileReader();
+        reader.readAsDataURL(document.getElementById("avatar-file").files[0]);
+        reader.onload = function () {
+            document.getElementById("avatar").src = reader.result;
+        };
+        reader.onerror = function (error) {
+            document.getElementById("avatar-file").value = "";
+        };
+    } else {
+        document.getElementById("avatar").src = "/images/user.png";
+    }
+}
+
 function remove() {
     document.getElementById("file-to-upload").style.display = "none";
     document.getElementById("file").value = '';
-}
-
-function add() {
-    document.getElementById("file").click();
 }
 
 function login(e) {
@@ -80,7 +91,32 @@ function login(e) {
 function register(e) {
     e.preventDefault();
     if (document.getElementById("register-username-input").value !== "" && document.getElementById("register-password-input").value === document.getElementById("register-password2-input").value) {
-        socket.emit("register", document.getElementById("register-username-input").value, document.getElementById("register-password-input").value, "/images/user.png");
+        if (document.getElementById("avatar-file").files[0]) {
+            var data = new FormData();
+            data.append('file', document.getElementById("avatar-file").files[0]);
+            var ajax = new XMLHttpRequest();
+            ajax.upload.addEventListener("progress", (e) => {
+                document.getElementById("avatar-upload-progress").value = Math.round((e.loaded / e.total) * 100);
+            }, false);
+            ajax.addEventListener("load", () => {
+                socket.emit("register", document.getElementById("register-username-input").value, document.getElementById("register-password-input").value, "/files/" + document.getElementById("avatar-file").files[0].name);
+            }, false);
+            ajax.addEventListener("error", () => {
+                socket.emit("register", document.getElementById("register-username-input").value, document.getElementById("register-password-input").value, "/images/user.png");
+            }, false);
+            ajax.addEventListener("abort", () => {
+                socket.emit("register", document.getElementById("register-username-input").value, document.getElementById("register-password-input").value, "/images/user.png");
+            }, false);
+            ajax.open("POST", "/upload");
+            ajax.send(data);
+            document.getElementById("avatar-upload-progress").style.display = "";
+            document.getElementById("avatar-upload-progress").value = "0";
+            document.getElementById("register-form").style.pointerEvents = "none";
+            document.getElementById("submit").innerHTML = "...";
+            document.getElementById("submit").style.backgroundColor = "#353d4f";
+        } else {
+            socket.emit("register", document.getElementById("register-username-input").value, document.getElementById("register-password-input").value, "/images/user.png");
+        }
     }
 }
 
@@ -94,37 +130,41 @@ function checkPassword() {
 
 function send(e) {
     e.preventDefault();
-    if (document.getElementById("message-input").value !== "") {
-        socket.emit("send", document.getElementById("message-input").value, document.getElementById("file").files[0] ? "/files/" + document.getElementById("file").files[0].name : null);
+    var message = document.getElementById("message-input").value;
+    if (message !== "") {
+        if (document.getElementById("file").files[0]) {
+            var data = new FormData();
+            var name = document.getElementById("file").files[0].name;
+            data.append('file', document.getElementById("file").files[0]);
+            var ajax = new XMLHttpRequest();
+            ajax.upload.addEventListener("progress", (e) => {
+                document.getElementById("upload-progress").value = Math.round((e.loaded / e.total) * 100);
+            }, false);
+            ajax.addEventListener("load", () => {
+                document.getElementById("file-upload").style.display = "none";
+                socket.emit("send", message, name);
+            }, false);
+            ajax.addEventListener("error", () => {
+                document.getElementById("file-upload").style.backgroundColor = "red";
+                document.getElementById("upload-name").innerHTML += " error";
+                document.getElementById("upload-progress").value = "100";
+            }, false);
+            ajax.addEventListener("abort", () => {
+                document.getElementById("file-upload").style.backgroundColor = "red";
+                document.getElementById("upload-name").innerHTML += " abort";
+                document.getElementById("upload-progress").value = "100";
+            }, false);
+            ajax.open("POST", "/upload");
+            ajax.send(data);
+            document.getElementById("file-upload").style.display = "";
+            document.getElementById("upload-progress").value = "0";
+            document.getElementById("upload-name").innerHTML = name;
+            document.getElementById("file-to-upload").style.display = "none";
+            document.getElementById("file").value = '';
+        } else {
+            socket.emit("send", message, null);
+        }
         document.getElementById("message-input").value = "";
-    }
-    if (document.getElementById("file").files[0]) {
-        var data = new FormData();
-        data.append('file', document.getElementById("file").files[0]);
-        var ajax = new XMLHttpRequest();
-        ajax.upload.addEventListener("progress", (e) => {
-            document.getElementById("upload-progress").value = Math.round((e.loaded / e.total) * 100);
-        }, false);
-        ajax.addEventListener("load", () => {
-            document.getElementById("file-upload").style.display = "none";
-        }, false);
-        ajax.addEventListener("error", () => {
-            document.getElementById("file-upload").style.backgroundColor = "red";
-            document.getElementById("upload-name").innerHTML += " error";
-            document.getElementById("upload-progress").value = "100";
-        }, false);
-        ajax.addEventListener("abort", () => {
-            document.getElementById("file-upload").style.backgroundColor = "red";
-            document.getElementById("upload-name").innerHTML += " abort";
-            document.getElementById("upload-progress").value = "100";
-        }, false);
-        ajax.open("POST", "/upload");
-        ajax.send(data);
-        document.getElementById("file-upload").style.display = "";
-        document.getElementById("upload-progress").value = "0";
-        document.getElementById("upload-name").innerHTML = document.getElementById("file").files[0].name;
-        document.getElementById("file-to-upload").style.display = "none";
-        document.getElementById("file").value = '';
     }
 }
 window.addEventListener("resize", () => {
@@ -138,7 +178,7 @@ socket.on("data", (users, messages, discordUsers) => {
         document.getElementById("users").innerHTML += `<div id="${users[id].id}"><img src="${users[id].avatar}"><span>${users[id].name}</span></div>`;
     }
     for (const message of messages) {
-        var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
+        var file = message.file ? `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
         document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     }
     for (const user of discordUsers) {
@@ -157,7 +197,7 @@ socket.on("error", (error) => {
     });
 });
 socket.on("message", (message) => {
-    var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
+    var file = message.file ? `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
     document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
     getMentions();

@@ -75,7 +75,7 @@
     <section class="messages-section" id="msgs">
         <% if (connected) { %>
         <% for (const message of messages) { %>
-        <% var file = message.file ? `<a href=${encodeURI(message.file)}>${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : ""; %>
+        <% var file = message.file ? `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : ""; %>
         <div>
             <img src="<%= message.author.avatar %>">
             <h2><%= message.author.name %> <span><%= message.date %><%= message.discord ? " DISCORD" : "" %></span></h2>
@@ -128,7 +128,7 @@
         </div>
         <form onsubmit="send(event)">
             <input id="message-input" type="text" placeholder="Message">
-            <button type="button" onclick="add()">
+            <button type="button" onclick="document.getElementById('file').click();">
                 <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512">
                     <path fill="currentColor"
                         d="M384 240v32c0 6.6-5.4 12-12 12h-88v88c0 6.6-5.4 12-12 12h-32c-6.6 0-12-5.4-12-12v-88h-88c-6.6 0-12-5.4-12-12v-32c0-6.6 5.4-12 12-12h88v-88c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v88h88c6.6 0 12 5.4 12 12zm120 16c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zm-48 0c0-110.5-89.5-200-200-200S56 145.5 56 256s89.5 200 200 200 200-89.5 200-200z">
@@ -157,6 +157,10 @@
             </button>
         </form>
         <form onsubmit="register(event)" id="register-form" style="display: none;">
+            <div type="button" onclick="document.getElementById('avatar-file').click();" class="avatar-button">
+                <img src="/images/user.png" alt="Avatar" id="avatar">
+            </div>
+            <progress id="avatar-upload-progress" value="20" max="100" style="display: none;"></progress>
             <p class="error"></p>
             <h5>Nom d'utilisateur</h5>
             <input id="register-username-input" type="text">
@@ -165,7 +169,7 @@
             <h5>Confirme ton mot de passe</h5>
             <input id="register-password2-input" onkeyup="checkPassword()" type="password">
             <br>
-            <button type="submit">
+            <button type="submit" id="submit">
                 S'inscrire
             </button>
             <p>
@@ -190,6 +194,7 @@
             </button>
         </div>
     </section>
+    <input type="file" style="display: none;" accept="image/*" id="avatar-file" onchange="avatarUploaded()">
     <input type="file" style="display: none;" id="file" onchange="uploaded()">
     <script src="js/main.js"></script>
 </body>
