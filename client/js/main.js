@@ -31,7 +31,11 @@ var socket = io();
     };
     String.prototype['autoLink'] = autoLink;
     var format = function () {
-        return this.autoLink()
+        return this.autoLink({
+            callback: function (url) {
+                return /\.(webp|svg|gif|png|jpe?g)$/i.test(url) ? '<a href="' + url + '"><img src="' + url + '"></a>' : null;
+            }
+        })
             .replace(/```(.*\n)?([^```][^```]*)```/g, "<pre><code>$2</code></pre>")
             .replace(/`([^`][^`]*)`/g, "<code>$1</code>")
             .replace(/~~([^~~][^~~]*)~~/g, "<s>$1</s>")
@@ -201,7 +205,7 @@ socket.on("error", (error) => {
     });
 });
 socket.on("message", (message) => {
-    var file = message.file ? `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
+    var file = message.file ? (/\.(webp|svg|gif|png|jpe?g)$/i.test(message.file) ? `<a href="${encodeURI(message.file)}"><img src="${encodeURI(message.file)}"></a>` : `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>`) : "";
     document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
     getMentions();

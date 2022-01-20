@@ -65,6 +65,19 @@ body {
     text-decoration: none;
 }
 
+.messages-section a img {
+    display: block;
+    position: relative;
+    left: 0;
+    border-radius: 0;
+    width: inherit;
+    height: inherit;
+    max-height: 500px;
+    max-width: 100%;
+    margin-right: 0;
+    vertical-align: middle;
+}
+
 .messages-section h2 {
     font-size: 1rem;
     color: white;
