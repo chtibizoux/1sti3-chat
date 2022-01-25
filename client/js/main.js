@@ -38,6 +38,7 @@ var socket = io();
         })
             .replace(/```(.*\n)?([^```][^```]*)```/g, "<pre><code>$2</code></pre>")
             .replace(/`([^`][^`]*)`/g, "<code>$1</code>")
+            .replace(/\n/g, "<br>")
             .replace(/~~([^~~][^~~]*)~~/g, "<s>$1</s>")
             .replace(/<@!?&?([0-9]{18})>/g, "<span class='mention'>@$1</span>")
             .replace(/<#([0-9]{18})>/g, "<span class='mention'>#$1</span>")
@@ -49,6 +50,27 @@ var socket = io();
             .replace(/[\*_]([^\*_][^\*_]*)[\*_]/g, "<em>$1</em>");
     }
     String.prototype['discordFormat'] = format;
+    var sendFormat = function () {
+        return this.autoLink({
+            callback: function (url) {
+                return /\.(webp|svg|gif|png|jpe?g)$/i.test(url) ? '<a href="' + url + '"><img src="' + url + '"></a>' : null;
+            }
+        })
+            .replace(/```(.*\n)?([^```][^```]*)```/g, "<span style='color: #72767d'>```</span><span style='color: #4CC029'>$1</span>$2<span style='color: #72767d'>```</span>")
+            .replace(/`([^`][^`]*)`/g, "<code>`$1`</code>")
+            .replace(/\n/g, "<br>")
+            .replace(/~~([^~~][^~~]*)~~/g, "<s>~~$1~~</s>")
+            // .replace(/<@!?&?([0-9]{18})>/g, "<span class='mention'>@$1</span>")
+            // .replace(/<#([0-9]{18})>/g, "<span class='mention'>#$1</span>")
+            .replace(/\|\|([^\|\|][^\|\|]*)\|\|/g, "<span class='spoiler show'>||$1||</span>")
+            .replace(/\*\*([^\*\*][^\*\*]*)\*\*/g, "<strong>**$1**</strong>")
+            .replace("@everyone", "<span class='mention'>@everyone</span>")
+            .replace("@here", "<span class='mention'>@here</span>")
+            .replace(/__([^__][^__]*)__/g, "<u>__$1__</u>")
+            .replace(/\*([^\*][^\*]*)\*/g, "<em>*$1*</em>")
+            .replace(/_([^_][^_]*)_/g, "<em>_$1_</em>");
+    }
+    String.prototype['sendFormat'] = sendFormat;
 }).call(this);
 
 function show() {
@@ -134,45 +156,47 @@ function checkPassword() {
     }
 }
 
-function send(e) {
-    e.preventDefault();
-    var message = document.getElementById("message-input").value;
-    if (message !== "") {
-        if (document.getElementById("file").files[0]) {
-            var data = new FormData();
-            var name = document.getElementById("file").files[0].name;
-            data.append('file', document.getElementById("file").files[0]);
-            var ajax = new XMLHttpRequest();
-            ajax.upload.addEventListener("progress", (e) => {
-                document.getElementById("upload-progress").value = Math.round((e.loaded / e.total) * 100);
-            }, false);
-            ajax.addEventListener("load", () => {
-                document.getElementById("file-upload").style.display = "none";
-                socket.emit("send", message, "/files/" + name);
-            }, false);
-            ajax.addEventListener("error", () => {
-                document.getElementById("file-upload").style.backgroundColor = "red";
-                document.getElementById("upload-name").innerHTML += " error";
-                document.getElementById("upload-progress").value = "100";
+function message(e) {
+    // document.getElementById("message-input").innerHTML = document.getElementById("message-input").innerText.sendFormat();
+    if (e.code === "Enter" && !e.shiftKey) {
+        var message = document.getElementById("message-input").innerText;
+        if (message !== "") {
+            if (document.getElementById("file").files[0]) {
+                var data = new FormData();
+                var name = document.getElementById("file").files[0].name;
+                data.append('file', document.getElementById("file").files[0]);
+                var ajax = new XMLHttpRequest();
+                ajax.upload.addEventListener("progress", (e) => {
+                    document.getElementById("upload-progress").value = Math.round((e.loaded / e.total) * 100);
+                }, false);
+                ajax.addEventListener("load", () => {
+                    document.getElementById("file-upload").style.display = "none";
+                    socket.emit("send", message, "/files/" + name);
+                }, false);
+                ajax.addEventListener("error", () => {
+                    document.getElementById("file-upload").style.backgroundColor = "red";
+                    document.getElementById("upload-name").innerHTML += " error";
+                    document.getElementById("upload-progress").value = "100";
+                    socket.emit("send", message, null);
+                }, false);
+                ajax.addEventListener("abort", () => {
+                    document.getElementById("file-upload").style.backgroundColor = "red";
+                    document.getElementById("upload-name").innerHTML += " abort";
+                    document.getElementById("upload-progress").value = "100";
+                    socket.emit("send", message, null);
+                }, false);
+                ajax.open("POST", "/upload");
+                ajax.send(data);
+                document.getElementById("file-upload").style.display = "";
+                document.getElementById("upload-progress").value = "0";
+                document.getElementById("upload-name").innerHTML = name;
+                document.getElementById("file-to-upload").style.display = "none";
+                document.getElementById("file").value = '';
+            } else {
                 socket.emit("send", message, null);
-            }, false);
-            ajax.addEventListener("abort", () => {
-                document.getElementById("file-upload").style.backgroundColor = "red";
-                document.getElementById("upload-name").innerHTML += " abort";
-                document.getElementById("upload-progress").value = "100";
-                socket.emit("send", message, null);
-            }, false);
-            ajax.open("POST", "/upload");
-            ajax.send(data);
-            document.getElementById("file-upload").style.display = "";
-            document.getElementById("upload-progress").value = "0";
-            document.getElementById("upload-name").innerHTML = name;
-            document.getElementById("file-to-upload").style.display = "none";
-            document.getElementById("file").value = '';
-        } else {
-            socket.emit("send", message, null);
+            }
+            document.getElementById("message-input").innerHTML = "";
         }
-        document.getElementById("message-input").value = "";
     }
 }
 window.addEventListener("resize", () => {

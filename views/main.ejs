@@ -69,6 +69,7 @@
             })
                 .replace(/```(.*\n)?([^```][^```]*)```/g, "<pre><code>$2</code></pre>")
                 .replace(/`([^`][^`]*)`/g, "<code>$1</code>")
+                .replace(/\n/g, "<br>")
                 .replace(/~~([^~~][^~~]*)~~/g, "<s>$1</s>")
                 .replace(/<@!?&?([0-9]{18})>/g, "<span class='mention'>@$1</span>")
                 .replace("@everyone", "<span class='mention'>@everyone</span>")
@@ -87,7 +88,8 @@
             <% var file = message.file ? (/\.(webp|svg|gif|png|jpe?g)$/i.test(message.file) ? `<a href="${encodeURI(message.file)}"><img src="${encodeURI(message.file)}"></a>` : `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>`) : ""; %>
             <div>
                 <img src="<%= message.author.avatar %>">
-                <h2><%= message.author.name %> <span><%= message.date %><%= message.discord ? " DISCORD" : "" %></span></h2>
+                <h2><%= message.author.name %> <span><%= message.date %><%= message.discord ? " DISCORD" : "" %></span>
+                </h2>
                 <p><%- message.text.discordFormat() %></p>
                 <%- file %>
             </div>
@@ -135,8 +137,8 @@
                     </path>
                 </svg>
             </div>
-            <form onsubmit="send(event)">
-                <input id="message-input" type="text" placeholder="Message">
+            <div class="send-form">
+                <div contenteditable="true" id="message-input" onkeyup="message(event)"></div>
                 <button type="button" onclick="document.getElementById('file').click();">
                     <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512">
                         <path fill="currentColor"
@@ -144,7 +146,7 @@
                         </path>
                     </svg>
                 </button>
-            </form>
+            </div>
         </section>
         <button type="button" onclick="show()" id="users-button">
             <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 640 512">
@@ -153,7 +155,7 @@
                 </path>
             </svg>
         </button>
-        <section id="login" class="login-section"<% if (connected) { %> style="transform: translateX(-100%);"<% } %>>
+        <section id="login" class="login-section" <% if (connected) { %> style="transform: translateX(-100%);" <% } %>>
             <form onsubmit="login(event)" id="login-form">
                 <p class="error"></p>
                 <h5>Nom d'utilisateur</h5>
@@ -198,7 +200,8 @@
                         </path>
                     </svg>
                 </button>
-                <button onclick="document.getElementById('register-form').style.display = '';document.getElementById('login-form').style.display = 'none';document.getElementById('login-other').style.display = 'none';">
+                <button
+                    onclick="document.getElementById('register-form').style.display = '';document.getElementById('login-form').style.display = 'none';document.getElementById('login-other').style.display = 'none';">
                     S'inscrire
                 </button>
             </div>

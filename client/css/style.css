@@ -9,7 +9,12 @@ body {
     background-color: #36393f;
     color: #dcddde;
 }
-.content{
+
+button {
+    outline: none;
+}
+
+.content {
     position: relative;
     width: 100%;
     height: 100%;
@@ -24,6 +29,7 @@ body {
     left: 0;
     padding: 10px 15px;
 }
+
 .links-section a {
     display: flex;
     align-items: center;
@@ -165,7 +171,7 @@ body {
     margin-left: 10px;
 }
 
-.send-section form {
+.send-form {
     position: relative;
     margin: 20px 25px;
 }
@@ -186,18 +192,27 @@ body {
     box-sizing: border-box;
 }
 
-.send-section input {
+#message-input {
     background-color: #40444b;
     border: none;
     outline: 0;
     width: 100%;
-    height: 44px;
     border-radius: 8px;
     color: #dcddde;
     font-size: 1rem;
     padding-left: 20px;
     padding-right: 64px;
     box-sizing: border-box;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    min-height: 44px;
+}
+
+#message-input:empty::before {
+    content: "Message";
+    position: absolute;
+    color: grey;
+    cursor: text;
 }
 
 .login-section {
@@ -283,6 +298,7 @@ body {
 .login-section input:focus {
     border-color: #00aff4;
 }
+
 span.spoiler {
     background-color: #202225;
     cursor: pointer;
@@ -292,6 +308,7 @@ span.spoiler {
     font-size: 1em;
     color: transparent;
 }
+
 span.mention {
     background-color: #5865f24d;
     cursor: pointer;
@@ -300,10 +317,12 @@ span.mention {
     font-size: 1em;
     color: white;
 }
+
 span.spoiler.show {
     background-color: hsla(0, 0%, 100%, .1);
     color: white;
 }
+
 pre code {
     font-size: 0.875rem;
     line-height: 1.125rem;
@@ -320,12 +339,12 @@ pre code {
 }
 
 code {
-    padding: .2em;
+    padding: .1em;
     border-radius: 3px;
     background: #2f3136;
     white-space: pre-wrap;
-    font-size: 1.1em;
-    margin: 0 -1px;
+    line-height: 1.4em;
+    margin: 0 3px;
 }
 
 .login-section button {
@@ -402,6 +421,7 @@ code {
     margin-bottom: 8px;
     background-color: hsl(210, 9.8%, 20%);
 }
+
 #users-button {
     display: none;
     position: absolute;
@@ -423,6 +443,7 @@ code {
     .links-section {
         right: 0;
     }
+
     #users-button {
         display: flex;
     }
@@ -438,7 +459,7 @@ code {
     .login-section {
         flex-direction: column;
     }
-    
+
     .users-section {
         width: 100%;
         transform: translateX(100%);
