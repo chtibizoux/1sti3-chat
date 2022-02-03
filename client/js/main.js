@@ -159,6 +159,7 @@ function checkPassword() {
 function message(e) {
     // document.getElementById("message-input").innerHTML = document.getElementById("message-input").innerText.sendFormat();
     if (e.code === "Enter" && !e.shiftKey) {
+        e.preventDefault();
         var message = document.getElementById("message-input").innerText;
         if (message !== "") {
             if (document.getElementById("file").files[0]) {
@@ -206,6 +207,7 @@ window.addEventListener("resize", () => {
 socket.on("data", (users, messages, discordUsers) => {
     document.getElementById("users").innerHTML = "";
     document.getElementById("msgs").innerHTML = "";
+    document.getElementById("discord-users").innerHTML = "";
     for (const id in users) {
         document.getElementById("users").innerHTML += `<div id="${users[id].id}"><img src="${users[id].avatar}"><span>${users[id].name}</span></div>`;
     }
@@ -214,9 +216,11 @@ socket.on("data", (users, messages, discordUsers) => {
         document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     }
     for (const user of discordUsers) {
-        document.getElementById("discord-users").innerHTML += `<div id="${user.id}"><img src="${user.avatar}"><span>${user.name}</span></div>`;
+        document.getElementById("discord-users").innerHTML += `<div id="${user.id}"><img src="${user.avatar || "https://cdn.glitch.global/b05fb1d4-94c5-48f2-a2dc-ec7b07cec5bb/c09a43a372ba81e3018c3151d4ed4773.png?v=1643911673841"}"><span>${user.name}</span></div>`;
     }
     document.getElementById("login").style.transform = "translateX(-100%)";
+    document.getElementById("avatar-file").style.display = "none";
+    document.getElementById("file").style.display = "";
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
     getMentions();
 });
@@ -300,3 +304,30 @@ function urlBase64ToUint8Array(base64String) {
     }
     return outputArray;
 }
+
+document.addEventListener("dragenter", function(event) {
+  document.getElementById("drag-zone").style.display = "";
+  console.log("dragenter");
+}, false);
+document.addEventListener("drop", function(event) {
+  document.getElementById("drag-zone").style.display = "none";
+  console.log("drop");
+}, false);
+document.getElementById("avatar-file").addEventListener("dragleave", function(event) {
+  document.getElementById("drag-zone").style.display = "none";
+  console.log("dragleave");
+}, false);
+document.getElementById("file").addEventListener("dragleave", function(event) {
+  document.getElementById("drag-zone").style.display = "none";
+  console.log("dragleave");
+}, false);
+window.addEventListener("paste", function(e) {
+  console.log("paste");
+  if (e.clipboardData.files.length > 0) {
+    e.preventDefault();
+    document.getElementById("file").files = e.clipboardData.files;
+    document.getElementById("avatar-file").files = e.clipboardData.files;
+    uploaded();
+    avatarUploaded();
+  }
+}, false);

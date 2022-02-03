@@ -117,7 +117,8 @@
                 <% if (connected) { %>
                 <% for (const user of discordUsers) { %>
                 <div id="<%= user.id %>">
-                    <img src="<%= user.avatar %>">
+                    <img
+                        src="<%= user.avatar || "https://cdn.glitch.global/b05fb1d4-94c5-48f2-a2dc-ec7b07cec5bb/c09a43a372ba81e3018c3151d4ed4773.png?v=1643911673841" %>">
                     <span><%= user.name %></span>
                 </div>
                 <% } %>
@@ -206,8 +207,12 @@
                 </button>
             </div>
         </section>
-        <input type="file" style="display: none;" accept="image/*" id="avatar-file" onchange="avatarUploaded()">
-        <input type="file" style="display: none;" id="file" onchange="uploaded()">
+        <div id="drag-zone" style="display: none;">
+            <input type="file" <% if (connected) { %> style="display: none;" <% } %> accept="image/*" id="avatar-file"
+                onchange="avatarUploaded()">
+            <input type="file" <% if (!connected) { %> style="display: none;" <% } %> id="file" onchange="uploaded()">
+            Drag file here
+        </div>
         <script src="js/main.js"></script>
     </div>
 </body>
