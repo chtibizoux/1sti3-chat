@@ -88,7 +88,8 @@
             <% var file = message.file ? (/\.(webp|svg|gif|png|jpe?g)$/i.test(message.file) ? `<a href="${encodeURI(message.file)}"><img src="${encodeURI(message.file)}"></a>` : `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>`) : ""; %>
             <div>
                 <img src="<%= message.author.avatar %>">
-                <h2><%= message.author.name %> <span><%= message.date %><%= message.discord ? " DISCORD" : "" %></span>
+                <h2><%= message.author.name %><% if (message.discord) { %><span
+                        class="discord">DISCORD</span><% } %><span><%= message.date %></span>
                 </h2>
                 <p><%- message.text.discordFormat() %></p>
                 <%- file %>
@@ -145,6 +146,13 @@
                         <path fill="currentColor"
                             d="M384 240v32c0 6.6-5.4 12-12 12h-88v88c0 6.6-5.4 12-12 12h-32c-6.6 0-12-5.4-12-12v-88h-88c-6.6 0-12-5.4-12-12v-32c0-6.6 5.4-12 12-12h88v-88c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v88h88c6.6 0 12 5.4 12 12zm120 16c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zm-48 0c0-110.5-89.5-200-200-200S56 145.5 56 256s89.5 200 200 200 200-89.5 200-200z">
                         </path>
+                    </svg>
+                </button>
+                <button type="button" class="send-button" onclick="send()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path fill="currentColor"
+                            d="M3.4 20.4l17.45-7.48c.81-.35.81-1.49 0-1.84L3.4 3.6c-.66-.29-1.39.2-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z" />
                     </svg>
                 </button>
             </div>
@@ -214,6 +222,9 @@
             Drag file here
         </div>
         <script src="js/main.js"></script>
+        <div id="kick-div" style="display: none;">
+            Tu as été expulser du chat pour une bonne raison.
+        </div>
     </div>
 </body>
 

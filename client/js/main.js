@@ -1,4 +1,3 @@
-
 var socket = io();
 
 (function () {
@@ -156,48 +155,52 @@ function checkPassword() {
     }
 }
 
+function send() {
+    var message = document.getElementById("message-input").innerText;
+    if (message !== "") {
+        if (document.getElementById("file").files[0]) {
+            var data = new FormData();
+            var name = document.getElementById("file").files[0].name;
+            data.append('file', document.getElementById("file").files[0]);
+            var ajax = new XMLHttpRequest();
+            ajax.upload.addEventListener("progress", (e) => {
+                document.getElementById("upload-progress").value = Math.round((e.loaded / e.total) * 100);
+            }, false);
+            ajax.addEventListener("load", () => {
+                document.getElementById("file-upload").style.display = "none";
+                socket.emit("send", message, "/files/" + name);
+            }, false);
+            ajax.addEventListener("error", () => {
+                document.getElementById("file-upload").style.backgroundColor = "red";
+                document.getElementById("upload-name").innerHTML += " error";
+                document.getElementById("upload-progress").value = "100";
+                socket.emit("send", message, null);
+            }, false);
+            ajax.addEventListener("abort", () => {
+                document.getElementById("file-upload").style.backgroundColor = "red";
+                document.getElementById("upload-name").innerHTML += " abort";
+                document.getElementById("upload-progress").value = "100";
+                socket.emit("send", message, null);
+            }, false);
+            ajax.open("POST", "/upload");
+            ajax.send(data);
+            document.getElementById("file-upload").style.display = "";
+            document.getElementById("upload-progress").value = "0";
+            document.getElementById("upload-name").innerHTML = name;
+            document.getElementById("file-to-upload").style.display = "none";
+            document.getElementById("file").value = '';
+        } else {
+            socket.emit("send", message, null);
+        }
+        document.getElementById("message-input").innerHTML = "";
+    }
+
+}
 function message(e) {
     // document.getElementById("message-input").innerHTML = document.getElementById("message-input").innerText.sendFormat();
     if (e.code === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        var message = document.getElementById("message-input").innerText;
-        if (message !== "") {
-            if (document.getElementById("file").files[0]) {
-                var data = new FormData();
-                var name = document.getElementById("file").files[0].name;
-                data.append('file', document.getElementById("file").files[0]);
-                var ajax = new XMLHttpRequest();
-                ajax.upload.addEventListener("progress", (e) => {
-                    document.getElementById("upload-progress").value = Math.round((e.loaded / e.total) * 100);
-                }, false);
-                ajax.addEventListener("load", () => {
-                    document.getElementById("file-upload").style.display = "none";
-                    socket.emit("send", message, "/files/" + name);
-                }, false);
-                ajax.addEventListener("error", () => {
-                    document.getElementById("file-upload").style.backgroundColor = "red";
-                    document.getElementById("upload-name").innerHTML += " error";
-                    document.getElementById("upload-progress").value = "100";
-                    socket.emit("send", message, null);
-                }, false);
-                ajax.addEventListener("abort", () => {
-                    document.getElementById("file-upload").style.backgroundColor = "red";
-                    document.getElementById("upload-name").innerHTML += " abort";
-                    document.getElementById("upload-progress").value = "100";
-                    socket.emit("send", message, null);
-                }, false);
-                ajax.open("POST", "/upload");
-                ajax.send(data);
-                document.getElementById("file-upload").style.display = "";
-                document.getElementById("upload-progress").value = "0";
-                document.getElementById("upload-name").innerHTML = name;
-                document.getElementById("file-to-upload").style.display = "none";
-                document.getElementById("file").value = '';
-            } else {
-                socket.emit("send", message, null);
-            }
-            document.getElementById("message-input").innerHTML = "";
-        }
+        send();
     }
 }
 window.addEventListener("resize", () => {
@@ -213,7 +216,7 @@ socket.on("data", (users, messages, discordUsers) => {
     }
     for (const message of messages) {
         var file = message.file ? `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>` : "";
-        document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
+        document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name}${message.discord ? '<span class="discord">DISCORD</span>' : ""} <span>${message.date}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     }
     for (const user of discordUsers) {
         document.getElementById("discord-users").innerHTML += `<div id="${user.id}"><img src="${user.avatar || "https://cdn.glitch.global/b05fb1d4-94c5-48f2-a2dc-ec7b07cec5bb/c09a43a372ba81e3018c3151d4ed4773.png?v=1643911673841"}"><span>${user.name}</span></div>`;
@@ -227,16 +230,25 @@ socket.on("data", (users, messages, discordUsers) => {
 getMentions();
 document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
 
+socket.on("kick", () => {
+    document.getElementById("kick-div").style.display = "";
+});
+
 socket.on("error", (error) => {
     Array.from(document.getElementsByClassName("error")).forEach((e) => {
         e.innerHTML = error;
     });
 });
+
 socket.on("message", (message) => {
     var file = message.file ? (/\.(webp|svg|gif|png|jpe?g)$/i.test(message.file) ? `<a href="${encodeURI(message.file)}"><img src="${encodeURI(message.file)}"></a>` : `<a href="${encodeURI(message.file)}">${decodeURI(message.file).slice(message.file.lastIndexOf("/") + 1)}</a>`) : "";
-    document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name} <span>${message.date}${message.discord ? " DISCORD" : ""}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
+    document.getElementById("msgs").innerHTML += `<div><img src="${message.author.avatar}"><h2>${message.author.name}${message.discord ? '<span class="discord">DISCORD</span>' : ""} <span>${message.date}</span></h2><p>${message.text.discordFormat()}</p>${file}</div>`;
     document.getElementById("msgs").scrollTo(0, document.getElementById("msgs").scrollHeight);
     getMentions();
+});
+
+socket.on("kickableUsers", (kickableUsers) => {
+    console.log(kickableUsers);
 });
 
 socket.on("user", (user) => {
@@ -305,29 +317,29 @@ function urlBase64ToUint8Array(base64String) {
     return outputArray;
 }
 
-document.addEventListener("dragenter", function(event) {
-  document.getElementById("drag-zone").style.display = "";
-  console.log("dragenter");
+document.addEventListener("dragenter", function (event) {
+    document.getElementById("drag-zone").style.display = "";
+    console.log("dragenter");
 }, false);
-document.addEventListener("drop", function(event) {
-  document.getElementById("drag-zone").style.display = "none";
-  console.log("drop");
+document.addEventListener("drop", function (event) {
+    document.getElementById("drag-zone").style.display = "none";
+    console.log("drop");
 }, false);
-document.getElementById("avatar-file").addEventListener("dragleave", function(event) {
-  document.getElementById("drag-zone").style.display = "none";
-  console.log("dragleave");
+document.getElementById("avatar-file").addEventListener("dragleave", function (event) {
+    document.getElementById("drag-zone").style.display = "none";
+    console.log("dragleave");
 }, false);
-document.getElementById("file").addEventListener("dragleave", function(event) {
-  document.getElementById("drag-zone").style.display = "none";
-  console.log("dragleave");
+document.getElementById("file").addEventListener("dragleave", function (event) {
+    document.getElementById("drag-zone").style.display = "none";
+    console.log("dragleave");
 }, false);
-window.addEventListener("paste", function(e) {
-  console.log("paste");
-  if (e.clipboardData.files.length > 0) {
-    e.preventDefault();
-    document.getElementById("file").files = e.clipboardData.files;
-    document.getElementById("avatar-file").files = e.clipboardData.files;
-    uploaded();
-    avatarUploaded();
-  }
+window.addEventListener("paste", function (e) {
+    console.log("paste");
+    if (e.clipboardData.files.length > 0) {
+        e.preventDefault();
+        document.getElementById("file").files = e.clipboardData.files;
+        document.getElementById("avatar-file").files = e.clipboardData.files;
+        uploaded();
+        avatarUploaded();
+    }
 }, false);

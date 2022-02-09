@@ -26,6 +26,7 @@ if (!fs.existsSync("./client/files")) {
 var config = require("./config.json");
 var messages = require("./messages.json");
 var users = require("./users.json");
+var kickableUsers = {};
 var connectedUsers = {};
 function saveUsers() {
     fs.writeFileSync("./users.json", JSON.stringify(users));
@@ -165,6 +166,9 @@ app.get("/login", passport.authenticate("discord.js"));
 io.on("connection", (socket) => {
     console.log("a user connected");
     var req = socket.request;
+    if (req.session.user) {
+        kickableUsers[socket.id] = req.session.user.name;
+    }
     socket.on("register", (username, password, avatar) => {
         username = username.trim();
         for (const id in users) {
@@ -184,6 +188,7 @@ io.on("connection", (socket) => {
         req.session.save();
         connectedUsers[socket.id] = req.session.user;
         io.emit("user", req.session.user);
+        kickableUsers[socket.id] = req.session.user.name;
         socket.emit("data", connectedUsers, messages, bot.users);
     });
     socket.on("login", (username, password) => {
@@ -194,6 +199,7 @@ io.on("connection", (socket) => {
                     req.session.user = { ...users[id], password: undefined };
                     req.session.save();
                     connectedUsers[id] = req.session.user;
+                    kickableUsers[socket.id] = req.session.user.name;
                     io.emit("user", req.session.user);
                     socket.emit("data", connectedUsers, messages, bot.users);
                     return;
@@ -207,8 +213,8 @@ io.on("connection", (socket) => {
     socket.on("send", (text, file) => {
         text = text.trim();
         if (req.session.user) {
-            var date = new Date();
-            date = (date.getDate() > 9 ? "" : "0") + date.getDate() + "/" + (date.getMonth() > 9 ? "" : "0") + (date.getMonth() + 1) + "/" + date.getFullYear() + " " + (date.getHours() > 9 ? "" : "0") + date.getHours() + ":" + (date.getMinutes() > 9 ? "" : "0") + date.getMinutes()
+            var date = new Date().toLocaleDateString(undefined, { day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "numeric" }).replace(",", "");
+            // date = (date.getDate() > 9 ? "" : "0") + date.getDate() + "/" + (date.getMonth() > 9 ? "" : "0") + (date.getMonth() + 1) + "/" + date.getFullYear() + " " + (date.getHours() > 9 ? "" : "0") + date.getHours() + ":" + (date.getMinutes() > 9 ? "" : "0") + date.getMinutes()
             var message = {
                 author: req.session.user,
                 text: text,
@@ -229,7 +235,16 @@ io.on("connection", (socket) => {
             socket.emit("mentions", mentions);
         });
     });
+    socket.on("kick", (userID) => {
+        io.broadcast.to(userID).emit("kick");
+    });
+    socket.on("kickableUsers", () => {
+        socket.emit("kickableUsers", kickableUsers);
+    });
     socket.on("disconnect", () => {
+        if (req.session.user && kickableUsers[socket.id]) {
+            delete kickableUsers[socket.id];
+        }
         if (req.session.user && connectedUsers[req.session.user.id]) {
             delete connectedUsers[req.session.user.id]
             io.emit("deleteUser", req.session.user.id);

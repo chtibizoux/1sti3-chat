@@ -42,6 +42,11 @@ button {
     border-radius: 12px;
 }
 
+.links-section svg {
+    width: 100%;
+    height: 100%;
+}
+
 .messages-section {
     position: absolute;
     top: 60px;
@@ -92,6 +97,25 @@ button {
     font-size: 0.75rem;
     color: #72767d;
     font-weight: 500;
+    margin-left: 7px;
+}
+
+.messages-section span.discord {
+    height: .9375rem;
+    padding: 0 .275rem;
+    margin-top: .075em;
+    border-radius: .1875rem;
+    margin-left: .25rem;
+    position: relative;
+    top: .1rem;
+    background: #5865f2;
+    color: #ffffff;
+    font-size: .625rem;
+    vertical-align: top;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    text-indent: 0;
 }
 
 .messages-section p {
@@ -171,6 +195,9 @@ button {
 }
 
 .send-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
     margin: 20px 25px;
 }
@@ -438,8 +465,13 @@ code {
     cursor: pointer;
 }
 
+#users-button svg {
+    width: 100%;
+    height: 100%;
+}
+
 #drag-zone {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     background: #2f3136;
@@ -460,7 +492,41 @@ code {
     opacity: 0;
 }
 
+#kick-div {
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background: #2f3136;
+    font-size: 30px;
+}
+
+button.send-button {
+    display: none;
+    position: relative;
+    background: #5865f2;
+    border-radius: 100%;
+    right: 0;
+}
+
+/* button.send-button:before {
+    content: "\e20a";
+} */
+
 @media screen and (max-width: 640px) {
+    .send-section button {
+        right: 54px;
+    }
+
+    button.send-button {
+        display: flex;
+        right: 0;
+    }
+
     .links-section {
         right: 0;
     }
