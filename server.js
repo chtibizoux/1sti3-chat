@@ -213,7 +213,7 @@ io.on("connection", (socket) => {
     socket.on("send", (text, file) => {
         text = text.trim();
         if (req.session.user) {
-            var date = new Date().toLocaleDateString(undefined, { day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "numeric" }).replace(",", "");
+            var date = new Date().toLocaleDateString('fr-FR', { day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "numeric" }).replace(",", "");
             // date = (date.getDate() > 9 ? "" : "0") + date.getDate() + "/" + (date.getMonth() > 9 ? "" : "0") + (date.getMonth() + 1) + "/" + date.getFullYear() + " " + (date.getHours() > 9 ? "" : "0") + date.getHours() + ":" + (date.getMinutes() > 9 ? "" : "0") + date.getMinutes()
             var message = {
                 author: req.session.user,
